@@ -1,0 +1,148 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Jezikovne Tehnologije - Guide</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="../favicon3.png" rel="icon" type="image/x-icon" />
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+		<div class="container">
+	<!-- Back button -->
+			<div id="back" class="col child">
+				<p><a href="../index.html"/a>Home</a></p>
+			</div>
+			<div id="installation" class="col child">
+	<!-- Installation -->
+				<h1 id="install">Installation of No Sketch Engine</h1>
+				<p>Download following packages from <a href="https://nlp.fi.muni.cz/trac/noske/wiki/Downloads" target="_blank">here</a>.</p>
+				<ul>
+					<li>python-signalfd_&lt;version&gt;.deb</li>
+					<li>finlib-&lt;version&gt;.deb</li>
+					<li>manatee-open-&lt;version&gt;.deb</li>
+					<li>manatee-open-python-&lt;version&gt;.deb</li>
+					<li>bonito-&lt;version&gt;.deb</li>
+					<li>bonito-www-&lt;version&gt;.deb</li>
+				</ul>
+
+				<ol>
+					<li><b>As root:</b> <tt>apt-get install libpcre3 libpcre++-dev apache2 python python-cheetah python-simplejson libltdl7</tt></li>
+					<li><b>As root install downloaded package:</b> <tt>dpkg -i python-signalfd_&lt;version&gt;.deb</tt></li>
+					<li><b>As root install downloaded packages:</b> <tt>dpkg -i finlib-&lt;version&gt;.deb manatee-open-&lt;version&gt;.deb manatee-open-python-&lt;version&gt;.deb bonito-&lt;version&gt;.deb bonito-www-&lt;version&gt;.deb</tt></li>
+					<li><b>Restart Apache server:</b> <tt>service apache2 restart</tt></li>
+				</ol>
+
+	<!-- Example corpora -->
+				<h2 id="susanne">Installation of example corpora ‘susanne’</h2>
+				<ol>
+					<li>Download example corpora (<tt>manatee-open-susanne_&lt;version&gt;.deb</tt>) from <a href="http://corpora.fi.muni.cz/noske/deb/1604/manatee-open/" target="_blank">here</a></li>
+					<li>As root install example corpora: <tt>dpkg -i manatee-open-susanne_&lt;version&gt;.deb</tt></li>
+					<li><b>You are done</b>, go to your &lt;ip or localhost&gt;/bonito.</li>
+				</ol>
+
+	<!-- Post-install -->
+				<h2 id="post-install">Post-installation steps</h2>
+				<p>Depending on what corpora you have and where they are located you have to edit the file <b>$CGIPATH/run.cgi</b> file (when installing from packages, this file is located in /var/www/bonito/run.cgi):</p>
+				<ul>
+					<li>the line <b>corplist = ['susanne', 'bnc']</b> contains a <b>list of available corpora</b></li>
+					<li>the line <b>corpname = 'bnc'</b> sets the <b>default corpus</b></li>
+					<li>the line <b>os.environ['MANATEE_REGISTRY'] = '/corpora/registry'</b> is the path to the <b>directory with corpus configuration files</b></li>
+				</ul>
+			</div>
+		
+			<div id="addCorpus" class="col child">
+	<!-- Add new corpus -->
+				<h1 id="new-corpus">Adding new corpora</h1>
+				<p><strong>IMPORTANT!</strong><b>Corpus configuration file name must be same as it is written in config file under NAME “&lt;corpus name&gt; and same name must be u5sed when recompiling corpus.</b></p>
+				<p><b>Required corpora as a vertical file (.vert) and corpora configuration file!</b></p>
+				<ol>
+			<!-- 1. -->
+					<li>Create folders where you will keep your corpora
+						<ol type="a">
+							<li>Folder where data about corpora is stored: <tt>mkdir -p <b>/corpora/data/</b>&lt;corpus name&gt;</tt></li>
+							<li>Folder where corpora configuration files are stored: <tt>mkdir -p <b>/corpora/registry</b></tt></li>
+							<li>Folder where corpora files are stored: <tt>mkdir -p <b>/corpora/vert</b></tt></li>
+						</ol>
+					</li>
+			<!-- 2. -->
+					<li>Copy or insert your corpus vertical file in the vert folder you created and copy or insert your corpus configuration file in the registry folder you created
+						<ol type="a">
+							<li><b>NOTE!</b> corpus configuration file name should be same as your &lt;corpus name&gt; to avoid possible further errors</li>
+							<li>EXAMPLE: “&lt;corpus name&gt;.conf” ← BAD!; should be just “&lt;corpus name&gt;”</li>
+						</ol>
+					</li>
+			<!-- 3. -->
+					<li>In your corpus configuration file correct following paths
+						<ol type="a">
+							<li><b>PATH “/corpora/data/&lt;corpus name&gt;”</b></li>
+							<li><b>VERTICAL “/corpora/vert/&lt;corpus name&gt;.vert”</b></li>
+							<li>If it exists, correct: TERMBASE “corpora/data/&lt;corpus name&gt;/terms-ws”</li>
+							<li><s>Correct or delete other variables, such as TERMDEF, DYNLIB,...</s> It's not neccessary to do this step unless you have issues.</li>
+						</ol>
+					</li>
+			<!-- 4. -->
+					<li><b>Recompile corpus</b> with (<b>run as root</b>, because it needs to create a directory for log file): <tt>compilecorp [OPTIONS] CORPNAME [FILENAME]</tt>
+						<ol type="a">
+							<li>OPTIONS - you have several options listed <a href="https://www.sketchengine.co.uk/documentation/local-installations/compiling-corpus/" target="_blank">here</a></li>
+							<li>CORPNAME - corpus name, same name is specified in corpus configuration file, NAME "&lt;corpus name&gt;”</li>
+							<li>FILENAME - path to corpus vert file (/corpora/vert/&lt;corpus name&gt;.vert); can be omitted, but specifying it might be more reliable</li>
+							<li><b>Whole command:</b> <tt>sudo compilecorp --recompile-corpus &lt;corpus name&gt; &lt;full path to vertical&gt;</tt></li>
+						</ol>
+					</li>
+			<!-- 5. -->
+					<li><b>Update “<a href="#post-install">run.cgi</a>"</b> file (by default in <tt>/var/www/bonito/run.cgi</tt>); assuming example corpus susanne was not installed, after the changes, parameters in run.cgi should look something like this
+						<ol type="a">
+							<li>OPTIONS - you have several options listed <a href="https://www.sketchengine.co.uk/documentation/local-installations/compiling-corpus/" target="_blank">here</a></li>
+							<li>Add your corpus to corplist
+								<ol type="i"><li>corplist = [u’&lt;corpus name&gt;’, ’&lt;corpus name 2&gt;’, ’&lt;corpus name 3&gt;’]</li></ol>
+							</li>
+							<li>Change default corpus
+								<ol type="i"><li>corpname = u’&lt;corpus name&gt;’</li></ol>
+							</li>
+							<li>Change path to corpus configuration files
+								<ol type="i"><li>os.environ[‘MANATEE_REGISTRY’] = ‘/corpora/registry’</li></ol>
+							</li>
+						</ol>
+					</li>
+			<!-- 6. -->
+					<li>If no errors or warnings are reported <b>corpus has been successfully added.</b> To add additional corpuses just add another data folder (show in step 1.a.) and repeat steps from 2. to 5.</li>
+				</ol>
+			</div>
+	<!-- Comments -->			
+			<div id="comments" class="col child">
+				<h1 id="notes">Comments</h1>
+				<ul>
+					<li>If running command <tt>sudo compilecorp --recompile-corpus &lt;corpus name&gt; &lt;full path to vertical&gt;</tt> fails to create necessary files in /corpora/data/&lt;corpus name&gt; try running following command as root first <tt>encodevert -c &lt;corpus name&gt; &lt;full path to vertical&gt;</tt></li>
+				</ul>
+			</div>
+		</div>
+
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/main.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
